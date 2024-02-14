@@ -14,7 +14,7 @@ def register_transmitter_handlers(dp: Dispatcher):
         if "#черногория" in lower:
             await msg.send_copy(
                 GROUP_ID,
-                message_thread_id=MONTENEGRO_THREAD_ID,
+                message_thread_id=None,
                 reply_markup=InlineKeyboardMarkup(
                     inline_keyboard=[
                         [InlineKeyboardButton(text="Посмотреть в канале", url=post_url)]
