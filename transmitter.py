@@ -21,7 +21,7 @@ def register_transmitter_handlers(dp: Dispatcher):
                     ]
                 )
             )
-        elif "#сербия" in lower:
+        if "#сербия" in lower:
             await msg.send_copy(
                 GROUP_ID,
                 message_thread_id=SERBIA_THREAD_ID,
