@@ -1,9 +1,9 @@
 from logging import getLogger
 
-from aiogram import Dispatcher
+from aiogram import Dispatcher, Bot
 from aiogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
-from loader import CHANNEL_ID, GROUP_ID, GROUP_TITLE, MONTENEGRO_THREAD_ID, SERBIA_THREAD_ID, DEV_KEY, storage
+from loader import CHANNEL_ID, GROUP_ID, GROUP_TITLE, MONTENEGRO_THREAD_ID, SERBIA_THREAD_ID, DEV_KEY, storage, bot
 
 logger = getLogger()
 
@@ -19,7 +19,8 @@ def register_transmitter_handlers(dp: Dispatcher):
                     inline_keyboard=[
                         [InlineKeyboardButton(text="Посмотреть в канале", url=post_url)]
                     ]
-                )
+                ),
+                disable_web_page_preview=True
             )
         if "#сербия" in lower:
             await msg.send_copy(
@@ -29,10 +30,18 @@ def register_transmitter_handlers(dp: Dispatcher):
                     inline_keyboard=[
                         [InlineKeyboardButton(text="Посмотреть в канале", url=post_url)]
                     ]
-                )
+                ),
+                disable_web_page_preview=True
             )
         else:
             ...
+        if not (await storage.get_data(**DEV_KEY)).get("latest_msg_id"):
+            new_msg_id = (await bot.send_message(
+                GROUP_ID,
+                message_thread_id=MONTENEGRO_THREAD_ID,
+                text="."
+            )).message_id
+            await storage.update_data(**DEV_KEY, data={"latest_msg_id": new_msg_id})
         await storage.update_data(
             **DEV_KEY,
             data={
@@ -40,7 +49,7 @@ def register_transmitter_handlers(dp: Dispatcher):
             }
         )
 
-    @dp.channel_post_handler(chat_id=CHANNEL_ID)
+    @dp.channel_post_handler(chat_id=CHANNEL_ID, content_types=["any"])
     async def new_post(post: Message):
         logger.info(f"New post {post.message_id}")
         new_msg_id = (await storage.get_data(**DEV_KEY))["latest_msg_id"]+1
