@@ -12,7 +12,7 @@ from functions import kb_from_dict, get_file, update_file, compress_text
 from statistics.stats_functions import create_month_stats
 from utils import FORWARD_CHAT_ID
 
-admins = [714799964, 347249536, 5614412865, 390167084, 2129598034, 359789155]
+admins = [714799964, 347249536, 5614412865, 390167084, 2129598034, 359789155, 1376054963]
 
 
 def edit_tab_name(tab, name):
