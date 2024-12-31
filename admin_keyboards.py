@@ -18,13 +18,17 @@ ap_settings_kb = InlineKeyboardMarkup(row_width=1).add(*[
 ])
 
 table_coef_kb = InlineKeyboardMarkup(row_width=1).add(*[
-    InlineKeyboardButton("R21", callback_data="R21"),
-    InlineKeyboardButton("R22", callback_data="R22"),
-    InlineKeyboardButton("R23", callback_data="R23"),
-    InlineKeyboardButton("R24", callback_data="R24"),
     InlineKeyboardButton("Черногория", callback_data="xe"),
-
 ])
+
+
+def build_table_coef_kb(data):
+    return InlineKeyboardMarkup(row_width=1).add(*[
+        InlineKeyboardButton("Сербия коэффициент RSD", callback_data="serbia/rsd_coef"),
+        InlineKeyboardButton("Сербия коэффициент EUR/USDT", callback_data="serbia/eur_usdt_coef"),
+        InlineKeyboardButton("Черногория коэффициент EUR/USDT", callback_data="montenegro/eur_usdt_coef"),
+    ])
+
 
 sphere_options_kb = InlineKeyboardMarkup(row_width=1).add(*[
     InlineKeyboardButton('Открыть эту вкладку', callback_data="open_tab"),

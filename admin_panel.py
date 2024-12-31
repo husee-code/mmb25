@@ -7,12 +7,14 @@ from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from aiogram.types import Message, CallbackQuery, InputFile
 
-from admin_keyboards import ap_start_kb, ap_settings_kb, table_coef_kb
+from admin_keyboards import ap_start_kb, ap_settings_kb, table_coef_kb, build_table_coef_kb
 from functions import kb_from_dict, get_file, update_file, compress_text
 from statistics.stats_functions import create_month_stats
 from utils import FORWARD_CHAT_ID
 
 admins = [714799964, 347249536, 5614412865, 390167084, 2129598034, 359789155, 1376054963]
+BASE_URL = "https://montemove-api.fun"
+# BASE_URL = "http://127.0.0.1:5000"
 
 
 def edit_tab_name(tab, name):
@@ -67,17 +69,20 @@ def register_admin_handlers(dp: Dispatcher):
             await callback.message.answer_photo(photo=InputFile('statistics/stats.png'))
             return
         if callback.data == "table_coef":
-            data = requests.get("https://montemove-api.fun/api/parser/data").json()
-            mults = data["mults"]
+            data = requests.get(f"{BASE_URL}/api/parser/data").json()
+
             text = (
-                "Коэффициенты курсов:\n"
-                f"R21: {mults['R21']}\n"
-                f"R22: {mults['R22']}\n"
-                f"R23: {mults['R23']}\n"
-                f"R24: {mults['R24']}\n"
-                f"Черногория: {data['mults']['xe']}"
+                f"Коэффициенты курсов:\n\n"
+                f"Сербия: \n"
+                f"{data['serbia']['mults']['rsd_coef']['name']}: {data['serbia']['mults']['rsd_coef']['value']}\n"
+                f"{data['serbia']['mults']['eur_usdt_coef']['name']}: {data['serbia']['mults']['eur_usdt_coef']['value']}\n"
+                f"\n"
+                f"Черногория: \n"
+                f"{data['montenegro']['mults']['eur_usdt_coef']['name']}: {data['montenegro']['mults']['eur_usdt_coef']['value']}\n"
+                f"\n"
             )
-            await callback.message.answer(text, reply_markup=table_coef_kb)
+
+            await callback.message.answer(text, reply_markup=build_table_coef_kb(...))
             await AdminPanelStates.TABLE_COEF_STATE.set()
             return
         await state.update_data(file=callback.data)  # callback.data == 'masters' | 'dosug' | 'places'
@@ -87,15 +92,14 @@ def register_admin_handlers(dp: Dispatcher):
     @dp.callback_query_handler(state=AdminPanelStates.TABLE_COEF_STATE)
     async def ap_set_table_coef(callback: CallbackQuery, state: FSMContext):
         await callback.message.answer("Введите новое значение множителя. Разделитель любой")
-        await state.update_data(origin=callback.data)
+        await state.update_data(value_to_change=callback.data)
         await AdminPanelStates.SET_COEF_VALUE_STATE.set()
-    
-    
+
     @dp.message_handler(state=AdminPanelStates.SET_COEF_VALUE_STATE)
     async def set_coef_value(message: Message, state: FSMContext):  
-        data = await state.get_data()
+        value_to_change = (await state.get_data())["value_to_change"]
         coef = float(message.text.replace(",", "."))
-        response = requests.post(f"https://montemove-api.fun/api/parser/data/mult", json={"origin": data["origin"], "value": coef}).text
+        response = requests.post(f"{BASE_URL}/api/parser/data/mult", json={"path": value_to_change, "value": coef}).text
         await message.answer(response)
         await AdminPanelStates.AP_START_STATE.set()
     
