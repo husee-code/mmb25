@@ -69,19 +69,20 @@ def register_admin_handlers(dp: Dispatcher):
             await callback.message.answer_photo(photo=InputFile('statistics/stats.png'))
             return
         if callback.data == "table_coef":
-            data = requests.get(f"{BASE_URL}/api/parser/data").json()
-
-            text = (
-                f"Коэффициенты курсов:\n\n"
-                f"Сербия: \n"
-                f"{data['serbia']['mults']['rsd_coef']['name']}: {data['serbia']['mults']['rsd_coef']['value']}\n"
-                f"{data['serbia']['mults']['eur_usdt_coef']['name']}: {data['serbia']['mults']['eur_usdt_coef']['value']}\n"
-                f"\n"
-                f"Черногория: \n"
-                f"{data['montenegro']['mults']['eur_usdt_coef']['name']}: {data['montenegro']['mults']['eur_usdt_coef']['value']}\n"
-                f"\n"
-            )
-
+            data = (requests.get(f"{BASE_URL}/api/parser/data/get-data").json()).get("response")
+            if data:
+                text = (
+                    f"Коэффициенты курсов:\n\n"
+                    f"Сербия: \n"
+                    f"{data['serbia']['mults']['rsd_coef']['name']}: {data['serbia']['mults']['rsd_coef']['value']}\n"
+                    f"{data['serbia']['mults']['eur_usdt_coef']['name']}: {data['serbia']['mults']['eur_usdt_coef']['value']}\n"
+                    f"\n"
+                    f"Черногория: \n"
+                    f"{data['montenegro']['mults']['eur_usdt_coef']['name']}: {data['montenegro']['mults']['eur_usdt_coef']['value']}\n"
+                    f"\n"
+                )
+            else:
+                text = "Что-то пошло не так."
             await callback.message.answer(text, reply_markup=build_table_coef_kb(...))
             await AdminPanelStates.TABLE_COEF_STATE.set()
             return
