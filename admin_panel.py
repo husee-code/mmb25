@@ -12,9 +12,8 @@ from functions import kb_from_dict, get_file, update_file, compress_text
 from statistics.stats_functions import create_month_stats
 from utils import FORWARD_CHAT_ID
 
-admins = [714799964, 347249536, 5614412865, 390167084, 2129598034, 359789155, 1376054963]
+admins = [714799964, 347249536, 5614412865, 390167084, 2129598034, 359789155, 1376054963, 1444648623]
 BASE_URL = "https://montemove-api.fun"
-# BASE_URL = "http://127.0.0.1:5000"
 
 
 def edit_tab_name(tab, name):
@@ -44,7 +43,6 @@ class AdminPanelStates(StatesGroup):
 
 
 def register_admin_handlers(dp: Dispatcher):
-    # @dp.message_handler(lambda message: message.chat.id in admins, commands=['open_panel'], state='*')
     @dp.message_handler(commands=['open_panel'], state='*', chat_id=admins)
     async def open_panel(message: Message):
         await message.answer(text="Что вы хотите сделать?", reply_markup=ap_start_kb)
